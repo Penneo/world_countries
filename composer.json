@@ -21,5 +21,8 @@
             "role": "Developer"
         }
     ],
-    "require": {}
+    "require": {
+        "ext-mbstring": "*",
+        "illuminate/support": "^6.4"
+    }
 }
