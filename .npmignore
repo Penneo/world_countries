@@ -1,5 +1,6 @@
 cache/*
 node_modules/*
+generator/*
 docs/*
 .gitattributes
 .gitignore

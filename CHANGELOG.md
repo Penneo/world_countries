@@ -1,3 +1,40 @@
+## version 2.6.0 (June 19, 2022)
+
+- added country names in Armenian, see [#68](https://github.com/stefangabos/world_countries/issues/68); thanks [Tigran Grigoryan](https://github.com/t1gr4n)!
+
+
+## version 2.5.1 (May 10, 2022)
+
+- removed unused flag of Netherlands Antilles
+- fixed #[67](https://github.com/stefangabos/world_countries/issues/67); thanks [Dennis Wueppelmann](https://github.com/Doener48)!
+
+## version 2.5.0 (March 30, 2022)
+
+- added ISO 3166-2 codes; see [#61](https://github.com/stefangabos/world_countries/issues/61); thanks to [Alan Jones](https://github.com/asjones987) for providing the links; what we have at this point should be considered as a start - a lot of codes are missing (according to [Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-2) which says there are 5047 while our list has only 3607) and names are written in their anglicized version rather than local - this will have to be updated by the community
+- added Esperanto language
+- updated formatting and usage of PHP files; thanks to [Jacek Karczmarczyk](https://github.com/jacekkarczmarczyk) for suggesting - see [#58](https://github.com/stefangabos/world_countries/issues/58)
+
+## version 2.4.0 (February 06, 2022)
+
+- added `XML` file format
+- added combined lists; see [#29](https://github.com/stefangabos/world_countries/issues/29)
+- aded a note about the fact that alpha-2 and alpha-3 codes are lowercase instead of uppercase as defined by ISO 3166-1; see [#50](https://github.com/stefangabos/world_countries/issues/50)
+- fixed `id` of Sudan for Swedish language
+- fixed broken SQL files
+- changed folder structure in preparations for adding more data to the library; for now, countries moved to their own `countries` folder inside the `data` folder and the `flags` folder was moved inside the `data` folder
+
+## version 2.3.0 (September 28, 2021)
+
+- flags are now available as JSON files with data uris; see [#41](https://github.com/stefangabos/world_countries/issues/41)
+- fixed folder name for Estonian translations; see [#52](https://github.com/stefangabos/world_countries/issues/52)
+- fixed a potential issue with the lists for German language by removing a soft-hyphen `(\u00ad)` from country names; see [#54](https://github.com/stefangabos/world_countries/issues/54)
+- fixed broken download links for Basque
+
+## version 2.2.0 (June 06, 2021)
+
+- added Bulgarian translations
+- updated country names for various languages
+
 ## version 2.1.1 (October 17, 2020)
 
 - the lists are now available as a [Composer package](https://packagist.org/packages/stefangabos/world_countries); thanks to [piotrpog](https://github.com/piotrpog) for suggesting!

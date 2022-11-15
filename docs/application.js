@@ -18,15 +18,18 @@ $(document).ready(function() {
 
         toggle_element = function($container) {
 
-            var all_world = $('.world:checked', $container).length === 4,
-                all_countries = $('.countries:checked', $container).length === 4,
-                all_flags = $('.flags:checked', $container).length === 5,
+            var all_world = $('.world:checked', $container).length === 5,
+                all_countries = $('.countries:checked', $container).length === 5,
+                all_subdivisions = $('.subdivisions:checked', $container).length === 5,
+                all_flags = $('.flags:checked', $container).length === 6,
                 any_world = $('.world:checked', $container).length > 0,
                 any_countries = $('.countries:checked', $container).length > 0,
+                any_subdivisions = $('.subdivisions:checked', $container).length > 0,
                 any_flags = $('.flags:checked', $container).length > 0,
                 $all = $('.all', $container),
                 $world = $('.all-world', $container),
                 $countries = $('.all-countries', $container),
+                $subdivisions = $('.all-subdivisions', $container),
                 $flags = $('.all-flags', $container);
 
             if (any_world || any_countries || any_flags) $container.addClass('selected animated pulse');
@@ -44,11 +47,19 @@ $(document).ready(function() {
             else if (any_countries) $countries.prop('checked', true).prop('indeterminate', true);
             else $countries.prop('checked', false).prop('indeterminate', false);
 
+            if (all_subdivisions) $subdivisions.prop('checked', true).prop('indeterminate', false);
+            else if (any_subdivisions) $subdivisions.prop('checked', true).prop('indeterminate', true);
+            else $subdivisions.prop('checked', false).prop('indeterminate', false);
+
             if (all_flags) $flags.prop('checked', true).prop('indeterminate', false);
             else if (any_flags) $flags.prop('checked', true).prop('indeterminate', true);
             else $flags.prop('checked', false).prop('indeterminate', false);
 
-            if ($('input[type="checkbox"]:checked').not('.all-flags').not('.all-countries').not('.all-world').not('.all').length)
+            if ((all_flags || any_flags) && $('input[name="flags-format"]:checked', $container).length === 0) {
+                $('#flags-format-images').prop('checked', true);
+            }
+
+            if ($('input[type="checkbox"]:checked').not('.all-subdivisions').not('.all-flags').not('.all-countries').not('.all-world').not('.all').length)
                 $('#download').removeClass('disabled');
             else $('#download').addClass('disabled');
 
@@ -64,6 +75,7 @@ $(document).ready(function() {
             $('.countries', $container).prop('checked', $element.prop('checked'));
         } else if ($element.hasClass('all-world')) $('.world', $container).prop('checked', $element.prop('checked'));
         else if ($element.hasClass('all-countries')) $('.countries', $container).prop('checked', $element.prop('checked'));
+        else if ($element.hasClass('all-subdivisions')) $('.subdivisions', $container).prop('checked', $element.prop('checked'));
         else if ($element.hasClass('all-flags')) $('.flags', $container).prop('checked', $element.prop('checked'));
 
         toggle_element($container);
@@ -75,9 +87,10 @@ $(document).ready(function() {
         e.preventDefault();
 
         var zip = new JSZip(),
-            items_to_download = $('input[type="checkbox"]:checked').not('.all-flags').not('.all-countries').not('.all-world').not('.all'),
+            items_to_download = $('input[type="checkbox"]:checked').not('.all-subdivisions').not('.all-flags').not('.all-countries').not('.all-world').not('.all'),
             items_processed = 0,
             total_downloads = $(items_to_download).length - $(items_to_download).filter('.flags').length + ($(items_to_download).filter('.flags').length * flags.length),
+            flag_types = $('input[name="flags-format"]:checked').val() || 'images',
             timeout;
 
         if (total_downloads) {
@@ -92,28 +105,54 @@ $(document).ready(function() {
 
                     if (value.indexOf('flags') > -1) {
 
-                        flags.forEach(function(flag) {
+                        if (flag_types === 'images') {
+
+                            flags.forEach(function(flag) {
+
+                                jQuery.ajax({
+                                    url:        'https://cdn.jsdelivr.net/gh/stefangabos/world_countries/data/flags/' + path[1] + '/' + flag + '.png',
+                                    cache:      false,
+                                    xhr:        function() {
+                                                    var xhr = new XMLHttpRequest();
+                                                    xhr.responseType= 'blob'
+                                                    return xhr;
+                                                },
+                                    success:    function(data) {
+                                                    zip.folder('flags/' + path[1]).file(flag + '.png', data, {blob: true});
+                                                    items_processed++;
+                                                }
+                                });
+
+                            });
+
+                        } else {
 
                             jQuery.ajax({
-                                url:        'https://cdn.jsdelivr.net/gh/stefangabos/world_countries/flags/' + path[1] + '/' + flag + '.png',
+                                url:        'https://cdn.jsdelivr.net/gh/stefangabos/world_countries/data/flags/' + path[1] + '/flags-' + path[1] + '.json',
                                 cache:      false,
                                 xhr:        function() {
                                                 var xhr = new XMLHttpRequest();
-                                                xhr.responseType= 'blob'
                                                 return xhr;
                                             },
-                                success:    function(data){
-                                                zip.folder('flags/' + path[1]).file(flag + '.png', data, {blob: true});
-                                                items_processed++;
+                                success:    function(data) {
+                                                zip.folder('flags/' + path[1]).file('flags-' + path[1] + '.json', JSON.stringify(data, null, 2), {});
+                                                items_processed += flags.length;
                                             }
                             });
 
-                        });
+                        }
+
+                    } else if (value.indexOf('subdivisions') > -1) {
+
+                        $.get('https://raw.githubusercontent.com/stefangabos/world_countries/master/data/subdivisions/' + path[1], function(result) {
+                            zip.folder('subdivisions').file(path[1], result);
+                            items_processed++;
+                        }, 'text');
 
                     } else
 
-                        $.get('https://cdn.jsdelivr.net/gh/stefangabos/world_countries/data/' + path[0] + '/' + path[1], function(result) {
-                            zip.folder('data/' + path[0]).file(path[1], result);
+                        $.get('https://raw.githubusercontent.com/stefangabos/world_countries/master/data/countries/' + path[0] + '/' + path[1], function(result) {
+                            zip.folder('countries/' + path[0]).file(path[1], result);
                             items_processed++;
                         }, 'text');
 
